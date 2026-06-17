@@ -24,13 +24,14 @@ import type { Donation, DonationFormData, DonationStatus } from '@/types/donatio
 
 const emptyForm: DonationFormData = {
   title: '',
-  category: '',
+  category: 'Alimento',
   quantity: '',
   neighborhood: '',
   contact: '',
   status: 'Disponivel',
 };
 
+const categoryOptions = ['Alimento', 'Roupa', 'Móvel', 'Brinquedo', 'Outro'];
 const statusOptions: DonationStatus[] = ['Disponivel', 'Reservado', 'Entregue'];
 
 const statusLabelMap: Record<DonationStatus, string> = {
@@ -78,7 +79,6 @@ export default function HomeScreen() {
   function validateForm() {
     return (
       form.title.trim() &&
-      form.category.trim() &&
       form.neighborhood.trim() &&
       form.contact.trim()
     );
@@ -86,7 +86,7 @@ export default function HomeScreen() {
 
   async function handleSubmit() {
     if (!validateForm()) {
-      Alert.alert('Campos obrigatórios', 'Preencha item, categoria, bairro e contato.');
+      Alert.alert('Campos obrigatórios', 'Preencha item, bairro e contato.');
       return;
     }
 
@@ -233,21 +233,38 @@ export default function HomeScreen() {
                   value={form.title}
                   onChangeText={(value) => updateFormValue('title', value)}
                 />
-                <View style={styles.row}>
-                  <TextInput
-                    placeholder="Categoria"
-                    placeholderTextColor="#7C8698"
-                    style={[styles.input, styles.rowInput]}
-                    value={form.category}
-                    onChangeText={(value) => updateFormValue('category', value)}
-                  />
-                  <TextInput
-                    placeholder="Quantidade"
-                    placeholderTextColor="#7C8698"
-                    style={[styles.input, styles.rowInput]}
-                    value={form.quantity}
-                    onChangeText={(value) => updateFormValue('quantity', value)}
-                  />
+                <TextInput
+                  placeholder="Quantidade"
+                  placeholderTextColor="#7C8698"
+                  style={styles.input}
+                  value={form.quantity}
+                  onChangeText={(value) => updateFormValue('quantity', value)}
+                />
+
+                <View style={styles.optionGroup}>
+                  <Text style={styles.optionLabel}>Categoria</Text>
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.statusList}>
+                    {categoryOptions.map((category) => (
+                      <Pressable
+                        key={category}
+                        style={[
+                          styles.statusOption,
+                          form.category === category && styles.statusOptionActive,
+                        ]}
+                        onPress={() => updateFormValue('category', category)}>
+                        <Text
+                          style={[
+                            styles.statusOptionText,
+                            form.category === category && styles.statusOptionTextActive,
+                          ]}>
+                          {category}
+                        </Text>
+                      </Pressable>
+                    ))}
+                  </ScrollView>
                 </View>
                 <TextInput
                   placeholder="Bairro ou região"
@@ -400,12 +417,13 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '800',
   },
-  row: {
-    flexDirection: 'row',
-    gap: 10,
+  optionGroup: {
+    gap: 8,
   },
-  rowInput: {
-    flex: 1,
+  optionLabel: {
+    color: '#334155',
+    fontSize: 14,
+    fontWeight: '800',
   },
   input: {
     backgroundColor: '#F8FAFC',
